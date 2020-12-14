@@ -1,0 +1,140 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "comments": "This template is released under an as-is, best effort, and is community supported.",
+        "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
+    },
+    "parameters": {
+        "spokeNamePrefix": {
+            "type": "string",
+            "defaultValue": "spoke",
+            "metadata": {
+                "description": "Enter a naming prefix to append to the resources created."
+            }
+        },
+        "spokeVNETPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.1.0/24",
+            "metadata": {
+                "description": "Enter a IP prefix for the virtual network."
+            }
+        },
+        "spokeSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.1.0/24",
+            "metadata": {
+                "description": "Enter a IP prefix for the VNET's subnet."
+            }
+        },
+        "spokeUsername": {
+            "type": "string",
+            "defaultValue": "paloalto",
+            "metadata": {
+                "description": "Enter a username for the test VM."
+            }
+        },
+        "spokePassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Enter a password for the test VM."
+            }
+        },
+        "existing-WANName": {
+            "type": "string",
+            "defaultValue": "virtual-wan",
+            "metadata": {
+                "description": "Name of the Virtual Wan."
+            }
+        },
+        "existing-WANResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Virtual Resource Group."
+            }
+        },
+        "existing-HubName": {
+            "type": "string",
+            "defaultValue": "hub1",
+            "metadata": {
+                "description": "Name of the Virtual Hub. A virtual hub is created inside a Virtual WAN."
+            }
+        },
+        "existing-HubAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.10.0.0/24",
+            "metadata": {
+                "description": "The hub address prefix. This address prefix will be used as the address prefix for the hub vnet"
+            }
+        },
+        "existing-Hub VPNGatewayName": {
+            "type": "string",
+            "defaultValue": "hub1-vpn-gateway",
+            "metadata": {
+                "description": "Name of the Vpn Gateway. A vpn gateway is created inside a virtual hub."
+            }
+        }
+    },
+    "variables": {
+        "global_resource_group": "[resourceGroup().name]",
+        "global_apiVersion": "2019-09-01",
+        "global_location": "[resourceGroup().location]",
+        "global_prefix": "[parameters('spokeNamePrefix')]",
+        "wan_rg": "[parameters('existing-WANResourceGroup')]",
+        "wan_id": "[concat(resourceId(variables('wan_rg'), 'Microsoft.Network/virtualWans', parameters('existing-WANName')))]",
+        "hub_name": "[parameters('existing-HubName')]",
+        "hub_address_prefix": "[parameters('existing-HubAddressPrefix')]",
+        "hub_vpn_gateway_id": "[concat(resourceId(variables('wan_rg'), 'Microsoft.Network/vpnGateways', parameters('existing-Hub VPNGatewayName')))]",
+        "hub_connection_name": "[concat(variables('vnet_name'),'-connection')]",
+        "vnet_name": "[concat(variables('global_prefix'),'vnet')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('global_apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('wan_rg')]",
+            "name": "CREATE_HUB_CONNECTION",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {},
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "name": "[variables('hub_name')]",
+                            "location": "[variables('global_location')]",
+                            "type": "Microsoft.Network/virtualHubs",
+                            "properties": {
+                                "addressPrefix": "[variables('hub_address_prefix')]",
+                                "virtualWan": {
+                                    "id": "[variables('wan_id')]"
+                                },
+                                "vpnGateway": {
+                                    "id": "[variables('hub_vpn_gateway_id')]"
+                                },
+                                "virtualNetworkConnections": [
+                                    {
+                                        "properties": {
+                                            "remoteVirtualNetwork": {
+                                                "id": "[concat(resourceId(variables('global_resource_group'), 'Microsoft.Network/virtualNetworks', variables('vnet_name')))]"
+                                            },
+                                            "allowHubToRemoteVnetTransit": true,
+                                            "allowRemoteVnetToUseHubVnetGateways": true,
+                                            "enableInternetSecurity": true
+                                        },
+                                        "name": "[variables('hub_connection_name')]"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ]
+}
