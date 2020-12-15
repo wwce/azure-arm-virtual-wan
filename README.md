@@ -33,7 +33,7 @@ A dedicated virtual network with a set of VM-Series firewalls must exist prior t
 
 A dedicated virtual network must exist with a set of VM-Series firewalls prior to proceeding.  This virutal netwokr should be separate from teh virtual network used in part 3.  In this step, you will connect the existing outbound VM-Series firewalls to the virtual hub.
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_inbound.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_outbound.json)
 
 #### Part 5:  Create Local Spoke VNET peered to outbound firewalls
 
