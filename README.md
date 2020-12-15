@@ -9,20 +9,24 @@ This build demonstrates how to secure Azure Virtual WAN traffic with VM-Series f
 
 The build shows two types of traffic flows through a Virtual WAN hub.  
 
-1.  <span style="color: red">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>
-2.  <span style="color: blue">IEast-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>
+1.  <span style="color:blue">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>
+    - Additional scale sets can be added throughout different Azure regions to achieve a globally scalable inbound security edge.
+2.  <span style="color:green">East-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>
+    - This design can be adapted into larger infrastructures that have regional hub and spoke architectures.  The VM-Series in each regional hub VNET, can secure ingress traffic coming from virtual WAN hubs.
+    - This can design can also be applied for traffic between ExpressRoute and VNET connections.
+    - If two VNETs are connected to the same vWAN hub, it is not possible to secure lateral traffic between two vWAN hub VNET connections. 
 
 ### Prerequisites
 
 The following items are required prior to launching the build.  
 
-1.  An active Azure subscription with appropriate permissions and resource quota allocation
-2.  Inbound VM-Series firewalls within a dedicated Virtual Network
-3.  Outbound VM-Series firewalls within a dedicated Virtual Network 
+1.  An active Azure subscription with appropriate permissions and resource quota allocation.
+2.  Inbound VM-Series scale set within a dedicated VNET.
+3.  Outbound VM-Series scale set within a dedicated VNET.
 
 
 The diagram below further illustrates the requirements before proceeding.  The greyed out resources will be built in each step of the build.
-loo
+
 ## Build Guide
 
 #### Part 1:  Create Virtual WAN & Virtual Hub
