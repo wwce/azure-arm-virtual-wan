@@ -9,8 +9,8 @@ This build demonstrates how to secure Azure Virtual WAN traffic with VM-Series f
 
 The build shows two types of traffic flows through a Virtual WAN hub.  
 
-1.  <span style="color: red">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>.
-2.  <span style="color: blue">IEast-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>..
+1.  <span style="color: red">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>
+2.  <span style="color: blue">IEast-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>
 
 ### Prerequisites
 
