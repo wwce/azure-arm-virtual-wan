@@ -1,0 +1,167 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "comments": "This template is released under an as-is, best effort, and is community supported.",
+        "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
+    },
+    "parameters": {
+        "WANResourceGroup": {
+            "type": "string",
+            "defaultValue": "virtual-wan-rg",
+            "metadata": {
+                "description": "Name of the vWAN resource group."
+            }
+        },
+        "securityVnetName": {
+            "type": "string",
+            "defaultValue": "paloaltonw-eastus-outbound-70681-vnet",
+            "metadata": {
+                "description": "Name of the existing security vNet to connect to the hub."
+            }
+        },
+        "securityVnetResourceGroup": {
+            "type": "string",
+            "defaultValue": "paloaltonw-eastus-outbound-70681",
+            "metadata": {
+                "description": "Name of the resource group that contains the security vNet."
+            }
+        },
+        "HubName": {
+            "type": "string",
+            "defaultValue": "eastus-hub",
+            "metadata": {
+                "description": "Name of an existing vWAN hub."
+            }
+        },
+        "ConnectionRoutePrefixes": {
+            "type": "string",
+            "defaultValue": "10.2.0.0/24, 10.2.1.0/24",
+            "metadata": {
+                "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
+            }
+        },
+        "VMSeriesInternalLBAddress": {
+            "type": "string",
+            "defaultValue": "10.0.2.100",
+            "metadata": {
+                "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
+            }
+        },
+        "HubAssociatedRouteTable": {
+            "type": "string",
+            "defaultValue": "defaultRouteTable",
+            "metadata": {
+                "description": "The existing vWAN hub route table to associated with the security vNet connection."
+            }
+        },
+        "HubPropagatedRouteTables": {
+            "type": "string",
+            "defaultValue": "defaultRouteTable",
+            "metadata": {
+                "description": "A comma separated list of existing vWAN hub route tables to propagate the security vNet connection."
+            }
+        },
+        "HubPropagatedLabels": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "A comma separated list of existing vWAN hub labels to propagate the security vNet connection."
+            }
+        }
+    },
+    "variables": {
+        "global_resource_group": "[resourceGroup().name]",
+        "global_location": "[resourceGroup().location]",
+        "global_apiVersion": "2020-06-01",
+
+        "vnet_name": "[parameters('securityVnetName')]",
+        "vnet_rg": "[parameters('securityVnetResourceGroup')]",
+        "wan_rg": "[parameters('WANResourceGroup')]",
+        "hub_name": "[parameters('HubName')]",
+        "hub_connection_name": "[concat(variables('vnet_name'),'-connection')]",
+
+        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]",
+        "next_hop_ip": "[parameters('VMSeriesInternalLBAddress')]",
+        "delimiter": [",", ";", " ," ],
+        "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
+        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]", 
+
+        "propagated_tables": "[split(parameters('HubPropagatedRouteTables'),variables('delimiter'))]",
+        "propagated_labels": "[parameters('HubPropagatedLabels')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('global_apiVersion')]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('wan_rg')]",
+            "name": "CREATE_HUB_CONNECTION",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {},
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualHubs/hubVirtualNetworkConnections",
+                            "apiVersion": "2020-05-01",
+                            "name": "[concat(variables('hub_name'), '/', variables('hub_connection_name'))]",
+                            "dependsOn": [],
+                            "properties": {
+                                "routingConfiguration": {
+                                    "associatedRouteTable": {
+                                        "id": "[variables('hub_route_table_associated')]"
+                                    },
+                                    "propagatedRouteTables": {
+                                        "labels": [
+                                            "[variables('propagated_labels')]"
+                                        ],
+
+
+                                        "copy": [
+                                            {
+                                                "name": "ids",
+                                                "count": "[length(variables('propagated_tables'))]",
+                                                "input": {
+                                                    "id": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), variables('propagated_tables')[copyIndex('ids')])]"
+                                                }
+                                            }
+                                        ]
+
+                                    },
+                                    "vnetRoutes": {
+
+                                        "copy": [
+                                            {
+                                                "name": "staticRoutes",
+                                                "count": "[length(variables('next_hop_prefixes'))]",
+                                                "input": {
+                                                    "name": "[concat('route-', copyIndex('staticRoutes'))]",
+                                                    "addressPrefixes": [
+                                                        "[variables('next_hop_prefixes')[copyIndex('staticRoutes')]]"
+                                                    ],
+                                                    "nextHopIpAddress": "[variables('next_hop_ip')]"
+
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "remoteVirtualNetwork": {
+                                    "id": "[concat(resourceId(variables('vnet_rg'), 'Microsoft.Network/virtualNetworks/', variables('vnet_name')))]"
+                                },
+                                "allowHubToRemoteVnetTransit": true,
+                                "allowRemoteVnetToUseHubVnetGateways": true,
+                                "enableInternetSecurity": true
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ]
+}
