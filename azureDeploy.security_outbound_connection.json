@@ -6,13 +6,6 @@
         "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
     },
     "parameters": {
-        "WANName": {
-            "type": "string",
-            "defaultValue": "virtual-wan",
-            "metadata": {
-                "description": "Name of the existing Virtual WAN."
-            }
-        },
         "WANResourceGroup": {
             "type": "string",
             "defaultValue": "virtual-wan-rg",
