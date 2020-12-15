@@ -2,59 +2,63 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "WANName": {
-        "type": "string",
-        "defaultValue": "virtual-wan",
-        "metadata": {
-          "description": "Name of the virtual WAN."
+        "WANName": {
+            "type": "string",
+            "defaultValue": "virtual-wan",
+            "metadata": {
+                "description": "Name of the virtual WAN."
+            }
+        },
+        "hubName": {
+            "type": "string",
+            "defaultValue": "hub1",
+            "metadata": {
+                "description": "Name of the virtual hub. This virtual hub is created inside the virtual WAN."
+            }
+        },
+        "hubAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.10.0.0/24",
+            "metadata": {
+                "description": "Enter the hub's address prefix. This address prefix will be used as the address prefix for the hub's virtual network."
+            }
         }
-      },
-      "hubName": {
-        "type": "string",
-        "defaultValue": "hub1",
-        "metadata": {
-          "description": "Name of the virtual hub. This virtual hub is created inside the virtual WAN."
-        }
-      },
-      "hubAddressPrefix": {
-        "type": "string",
-        "defaultValue": "10.10.0.0/24",
-        "metadata": {
-          "description": "Enter the hub's address prefix. This address prefix will be used as the address prefix for the hub's virtual network."
-        }
-      }
     },
     "variables": {
-      "location": "[resourceGroup().location]",
-      "api_version": "2019-09-01",
-      "wan_name": "[parameters('WANName')]",
-      "wan_sku": "Standard",
-      "hub_name": "[parameters('hubName')]",
-      "hub_address_prefix": "[parameters('hubAddressPrefix')]"
+        "location": "[resourceGroup().location]",
+        "api_version": "2020-05-01",
+        "wan_name": "[parameters('WANName')]",
+        "wan_sku": "Standard",
+        "hub_name": "[parameters('hubName')]",
+        "hub_address_prefix": "[parameters('hubAddressPrefix')]"
     },
-    "resources": [{
-        "type": "Microsoft.Network/virtualWans",
-        "name": "[variables('wan_name')]",
-        "apiVersion": "[variables('api_version')]",
-        "location": "[variables('location')]",
-        "properties": {
-          "type": "[variables('wan_sku')]"
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualWans",
+            "name": "[variables('wan_name')]",
+            "apiVersion": "[variables('api_version')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "type": "[variables('wan_sku')]",
+                "disableVpnEncryption": false,
+                "allowBranchToBranchTraffic": false,
+                "office365LocalBreakoutCategory": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualHubs",
+            "name": "[variables('hub_name')]",
+            "apiVersion": "[variables('api_version')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualWans/', variables('wan_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[variables('hub_address_prefix')]",
+                "virtualWan": {
+                    "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
+                }
+            }
         }
-      },
-      {
-        "type": "Microsoft.Network/virtualHubs",
-        "name": "[variables('hub_name')]",
-        "apiVersion": "[variables('api_version')]",
-        "location": "[variables('location')]",
-        "dependsOn": [
-          "[concat('Microsoft.Network/virtualWans/', variables('wan_name'))]"
-        ],
-        "properties": {
-          "addressPrefix": "[variables('hub_address_prefix')]",
-          "virtualWan": {
-            "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
-          }
-        }
-      }
     ]
-  }
+}
