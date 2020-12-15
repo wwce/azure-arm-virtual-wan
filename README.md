@@ -1,4 +1,4 @@
-# Panorama Orchestration & Azure Virtual WAN Build
+# Panorama Orchestration & Azure Virtual WAN
 Connects Security vNets to an Azure Virtual WAN Hub to secure global inbound and cross Virtual WAN traffic through regional security vNets.
 
 ## Overview 
