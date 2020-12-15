@@ -43,14 +43,14 @@
         },
         "WANResourceGroup": {
             "type": "string",
-            "defaultValue": "virtual-wan-rg",
+            "defaultValue": "wan-rg",
             "metadata": {
                 "description": "Name of the vWAN resource group."
             }
         },
         "HubName": {
             "type": "string",
-            "defaultValue": "eastus-hub",
+            "defaultValue": "hub1",
             "metadata": {
                 "description": "Name of an existing vWAN hub."
             }
