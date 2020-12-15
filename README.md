@@ -3,10 +3,26 @@ Connects Security vNets to an Azure Virtual WAN Hub to secure global inbound and
 
 ## Overview 
 
-This build demonstrates how to secure Azure Virtual WAN traffic with VM-Series firewalls deployed through Panorama Orchestration.  The build is broken down into 3 major sections.  Please note, not all sections are required if the resources already exist.
+This build demonstrates how to secure Azure Virtual WAN traffic with VM-Series firewalls deployed through Panorama Orchestration.  The build is broken down into 3 major sections.  Certain sections may not be required if the Azure resources already exist.
 
-## Prerequisites
+### Design
 
+The build shows two types of traffic flows through a Virtual WAN hub.  
+
+1.  <span style="color: red">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>.
+2.  <span style="color: blue">IEast-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>..
+
+### Prerequisites
+
+The following items are required prior to launching the build.  
+
+1.  An active Azure subscription with appropriate permissions and resource quota allocation
+2.  Inbound VM-Series firewalls within a dedicated Virtual Network
+3.  Outbound VM-Series firewalls within a dedicated Virtual Network 
+
+
+The diagram below further illustrates the requirements before proceeding.  The greyed out resources will be built in each step of the build.
+loo
 ## Build Guide
 
 #### Part 1:  Create Virtual WAN & Virtual Hub
