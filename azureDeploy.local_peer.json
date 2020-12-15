@@ -1,0 +1,381 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "comments": "This template is released under an as-is, best effort, and is community supported.",
+        "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
+    },
+    "parameters": {
+        "securityVNETName": {
+            "type": "string",
+            "defaultValue": "paloaltonw-eastus-outbound-70681-vnet",
+            "metadata": {
+                "description": "Name of the existing security VNET that contains the VM-Series firewalls."
+            }
+        },
+        "securityVNETResourceGroup": {
+            "type": "string",
+            "defaultValue": "paloaltonw-eastus-outbound-70681",
+            "metadata": {
+                "description": "Name of the resource group that contains the existing security VNET."
+            }
+        },
+        "VMSeriesLBAddress": {
+            "type": "string",
+            "defaultValue": "10.0.0.74",
+            "metadata": {
+                "description": "IP address of VM-Series internal load balancer.  This IP will be added as the next hop IP in the spoke VNETs route table."
+            }
+        },
+        "spokeNamePrefix": {
+            "type": "string",
+            "defaultValue": "spoke",
+            "metadata": {
+                "description": "Enter a naming prefix to append to the spoke resources created."
+            }
+        },
+        "spokeVNETPrefix": {
+            "type": "string",
+            "defaultValue": "10.3.0.0/24",
+            "metadata": {
+                "description": "Enter a IP prefix for the spoke VNET."
+            }
+        },
+        "spokeSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.3.0.0/28",
+            "metadata": {
+                "description": "Enter a IP prefix for the spoke VNET's subnet."
+            }
+        },
+        "spokeUsername": {
+            "type": "string",
+            "defaultValue": "paloalto",
+            "metadata": {
+                "description": "Enter a username for the spoke test VM."
+            }
+        },
+        "spokePassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Enter a password for the spoke test VM."
+            }
+        }
+    },
+    "variables": {
+        "global_resource_group": "[resourceGroup().name]",
+        "global_apiVersion": "2019-09-01",
+        "global_location": "[resourceGroup().location]",
+
+        "security_vnet_name": "[parameters('securityVNETName')]",
+        "security_vnet_rg": "[parameters('securityVNETResourceGroup')]",
+
+        "spoke_prefix": "[parameters('spokeNamePrefix')]",
+        "spoke_vnet_name": "[concat(variables('spoke_prefix'),'-vnet')]",
+        "spoke_vnet_cidr": "[parameters('spokeVNETPrefix')]",
+        "spoke_vnet_subnet0_name": "[concat(variables('spoke_prefix'),'-subnet0')]",
+        "spoke_vnet_subnet0_cidr": "[parameters('spokeSubnetPrefix')]",
+        "spoke_vm_apiVersion": "2018-06-01",
+        "spoke_vm_user": "[parameters('spokeUsername')]",
+        "spoke_vm_password": "[parameters('spokePassword')]",
+        "spoke_vm_vmSize": "Standard_B1s",
+        "spoke_vm_publisher": "Canonical",
+        "spoke_vm_offer": "UbuntuServer",
+        "spoke_vm_sku": "18.04-LTS",
+        "spoke_vm_version": "latest",
+        "spoke_vm_osType": "Linux",
+        "spoke_vm_diskSizeGB": "30",
+        "spoke_vm_diskType": "Standard_LRS",
+        "spoke_vm_name": "[concat(variables('spoke_prefix'),'-vm')]",
+        "spoke_vm_nic_name": "[concat(variables('spoke_prefix'), '-nic0')]",
+        "spoke_vm_nsg_name": "[concat(variables('spoke_prefix'), '-nsg')]",
+
+        "rtb_name": "[concat(variables('spoke_prefix'),'-rtb')]",
+        "rtb_route0_cidr": "0.0.0.0/0",
+        "rtb_route1_cidr": "10.0.0.0/8",
+        "rtb_route2_cidr": "192.168.0.0/16",
+        "rtb_route3_cidr": "172.16.0.0/12",
+        "rtb_next_hop_ip": "[parameters('VMSeriesLBAddress')]"
+
+
+    },
+    "resources": [
+        {
+            "comments": "CREATE VIRTUAL NETWORK WITH SUBNET",
+            "type": "Microsoft.Resources/deployments",
+            "name": "CREATE_VNET",
+            "apiVersion": "[variables('global_apiVersion')]",
+            "resourceGroup": "[variables('global_resource_group')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/routeTables",
+                            "name": "[variables('rtb_name')]",
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "routes": [
+                                    {
+                                        "name": "route0",
+                                        "properties": {
+                                            "addressPrefix": "[variables('rtb_route0_cidr')]",
+                                            "nextHopType": "VirtualAppliance",
+                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                                        }
+                                    },
+                                    {
+                                        "name": "route1",
+                                        "properties": {
+                                            "addressPrefix": "[variables('rtb_route1_cidr')]",
+                                            "nextHopType": "VirtualAppliance",
+                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                                        }
+                                    },
+                                    {
+                                        "name": "route2",
+                                        "properties": {
+                                            "addressPrefix": "[variables('rtb_route2_cidr')]",
+                                            "nextHopType": "VirtualAppliance",
+                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                                        }
+                                    },
+                                    {
+                                        "name": "route3",
+                                        "properties": {
+                                            "addressPrefix": "[variables('rtb_route3_cidr')]",
+                                            "nextHopType": "VirtualAppliance",
+                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "name": "[variables('spoke_vnet_name')]",
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "location": "[variables('global_location')]",
+                            "dependsOn": [ "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]" ],
+                            "properties": {
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "[variables('spoke_vnet_cidr')]"
+                                    ]
+                                },
+                                "subnets": [
+                                    {
+                                        "name": "[variables('spoke_vnet_subnet0_name')]",
+                                        "properties": {
+                                            "addressPrefix": "[variables('spoke_vnet_subnet0_cidr')]",
+                                            "routeTable": {
+                                                "id": "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                            "name": "[concat(variables('spoke_vnet_name'), '/', variables('security_vnet_name'), '-peer' )]",
+                            "location": "[variables('global_location')]",
+                            "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]" ],
+                            "properties": {
+                                "allowVirtualNetworkAccess": true,
+                                "allowForwardedTraffic": true,
+                                "allowGatewayTransit": true,
+                                "useRemoteGateways": false,
+                                "remoteVirtualNetwork": {
+                                    "id": "[resourceId(variables('security_vnet_rg'), 'Microsoft.Network/virtualNetworks', variables('security_vnet_name'))]"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "comments": "CREATE SECURITY VNET TO SPOKE PEER",
+            "type": "Microsoft.Resources/deployments",
+            "name": "CREATE_PEER_LINK",
+            "apiVersion": "[variables('global_apiVersion')]",
+            "resourceGroup": "[variables('security_vnet_rg')]",
+            "dependsOn": [
+                "CREATE_VNET"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+
+
+                        {
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                            "name": "[concat(variables('security_vnet_name'), '/', variables('spoke_vnet_name'), '-peer')]",
+                            "location": "[variables('global_location')]",
+                            "dependsOn": [],
+                            "properties": {
+                                "allowVirtualNetworkAccess": true,
+                                "allowForwardedTraffic": true,
+                                "allowGatewayTransit": true,
+                                "useRemoteGateways": false,
+                                "remoteVirtualNetwork": {
+                                    "id": "[resourceId(variables('global_resource_group'), 'Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
+                                }
+                            }
+                        }
+
+
+                    ]
+                }
+            }
+        },
+        {
+            "comments": "CREATE VM",
+            "type": "Microsoft.Resources/deployments",
+            "name": "CREATE_VM",
+            "apiVersion": "[variables('spoke_vm_apiVersion')]",
+            "resourceGroup": "[variables('global_resource_group')]",
+            "dependsOn": [
+                "CREATE_VNET"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/networkSecurityGroups",
+                            "name": "[variables('spoke_vm_nsg_name')]",
+                            "apiVersion": "[variables('spoke_vm_apiVersion')]",
+                            "location": "[variables('global_location')]",
+                            "properties": {
+                                "securityRules": [
+                                    {
+                                        "name": "[concat(variables('spoke_vm_nsg_name'), '-in')]",
+                                        "properties": {
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": "100",
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "[concat(variables('spoke_vm_nsg_name'), '-out')]",
+                                        "properties": {
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": "100",
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "comments": "CREATE_NIC",
+                            "type": "Microsoft.Network/networkInterfaces",
+                            "name": "[variables('spoke_vm_nic_name')]",
+                            "apiVersion": "[variables('spoke_vm_apiVersion')]",
+                            "location": "[variables('global_location')]",
+                            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]" ],
+                            "properties": {
+                                "ipConfigurations": [
+                                    {
+                                        "name": "ipconfig1",
+                                        "properties": {
+                                            "privateIPAllocationMethod": "Dynamic",
+                                            "subnet": {
+                                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name')), '/subnets/', variables('spoke_vnet_subnet0_name'))]"
+                                            },
+                                            "primary": true,
+                                            "privateIPAddressVersion": "IPv4"
+                                        }
+                                    }
+                                ],
+                                "enableIPForwarding": false
+                            }
+                        },
+                        {
+                            "comments": "CREATE_VM",
+                            "type": "Microsoft.Compute/virtualMachines",
+                            "name": "[variables('spoke_vm_name')]",
+                            "apiVersion": "[variables('spoke_vm_apiVersion')]",
+                            "location": "[variables('global_location')]",
+                            "properties": {
+                                "hardwareProfile": {
+                                    "vmSize": "[variables('spoke_vm_vmSize')]"
+                                },
+                                "storageProfile": {
+                                    "imageReference": {
+                                        "publisher": "[variables('spoke_vm_publisher')]",
+                                        "offer": "[variables('spoke_vm_offer')]",
+                                        "sku": "[variables('spoke_vm_sku')]",
+                                        "version": "[variables('spoke_vm_version')]"
+                                    },
+                                    "osDisk": {
+                                        "osType": "[variables('spoke_vm_osType')]",
+                                        "createOption": "FromImage",
+                                        "caching": "ReadWrite",
+                                        "managedDisk": {
+                                            "storageAccountType": "[variables('spoke_vm_diskType')]"
+                                        },
+                                        "diskSizeGB": "[variables('spoke_vm_diskSizeGB')]"
+                                    }
+                                },
+                                "osProfile": {
+                                    "computerName": "[variables('spoke_vm_name')]",
+                                    "adminUsername": "[variables('spoke_vm_user')]",
+                                    "adminPassword": "[variables('spoke_vm_password')]",
+                                    "linuxConfiguration": {
+                                        "disablePasswordAuthentication": false,
+                                        "provisionVMAgent": true
+                                    },
+                                    "allowExtensionOperations": true
+                                },
+                                "networkProfile": {
+                                    "networkInterfaces": [
+                                        {
+                                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('spoke_vm_nic_name'))]",
+                                            "properties": {
+                                                "primary": true
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/networkInterfaces', variables('spoke_vm_nic_name'))]"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
