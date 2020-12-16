@@ -41,7 +41,7 @@
             "properties": {
                 "type": "[variables('wan_sku')]",
                 "disableVpnEncryption": false,
-                "allowBranchToBranchTraffic": false,
+                "allowBranchToBranchTraffic": true,
                 "office365LocalBreakoutCategory": "None"
             }
         },
@@ -56,7 +56,6 @@
             "properties": {
                 "virtualHubRouteTableV2s": [],
                 "addressPrefix": "10.10.0.0/24",
-                "virtualRouterAsn": 65515,
                 "virtualRouterIps": [],
                 "routeTable": {
                     "routes": []
