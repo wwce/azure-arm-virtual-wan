@@ -50,6 +50,7 @@
             "name": "[variables('hub_name')]",
             "apiVersion": "[variables('api_version')]",
             "location": "[variables('location')]",
+            "tags": {},
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualWans/', variables('wan_name'))]"
             ],
@@ -57,7 +58,8 @@
                 "addressPrefix": "[variables('hub_address_prefix')]",
                 "virtualWan": {
                     "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
-                }
+                },
+                "sku": "Standard"
             }
         }
     ]
