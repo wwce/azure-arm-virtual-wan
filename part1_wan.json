@@ -50,16 +50,49 @@
             "name": "[variables('hub_name')]",
             "apiVersion": "[variables('api_version')]",
             "location": "[variables('location')]",
-            "tags": {},
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualWans/', variables('wan_name'))]"
+                "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
             ],
             "properties": {
-                "addressPrefix": "[variables('hub_address_prefix')]",
+                "virtualHubRouteTableV2s": [],
+                "addressPrefix": "10.10.0.0/24",
+                "virtualRouterAsn": 65515,
+                "virtualRouterIps": [],
+                "routeTable": {
+                    "routes": []
+                },
                 "virtualWan": {
                     "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
                 },
                 "sku": "Standard"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualHubs/hubRouteTables",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(variables('hub_name'), '/defaultRouteTable')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualHubs', variables('hub_name'))]"
+            ],
+            "properties": {
+                "routes": [],
+                "labels": [
+                    "default"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualHubs/hubRouteTables",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(variables('hub_name'), '/noneRouteTable')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualHubs', variables('hub_name'))]"
+            ],
+            "properties": {
+                "routes": [],
+                "labels": [
+                    "none"
+                ]
             }
         }
     ]
