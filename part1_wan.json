@@ -55,7 +55,7 @@
             ],
             "properties": {
                 "virtualHubRouteTableV2s": [],
-                "addressPrefix": "10.10.0.0/24",
+                "addressPrefix": "[variables('hub_address_prefix')]",
                 "virtualRouterIps": [],
                 "routeTable": {
                     "routes": []
@@ -95,5 +95,19 @@
                 ]
             }
         }
-    ]
+    ],
+    "outputs": {
+        "REGION": {
+            "value" : "[variables('wan_name')]",
+            "type": "string"
+        },
+        "WAN_NAME": {
+            "value" : "[variables('hub_name')]",
+            "type": "string"
+        },
+        "HUB_NAME": {
+            "value" : "[variables('location')]",
+            "type": "string"
+        }
+    }
 }
