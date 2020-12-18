@@ -43,14 +43,14 @@
         },
         "WANResourceGroup": {
             "type": "string",
-            "defaultValue": "wan-rg",
+            "defaultValue": "virtual-wan-rg",
             "metadata": {
                 "description": "Name of the vWAN resource group."
             }
         },
         "HubName": {
             "type": "string",
-            "defaultValue": "hub1",
+            "defaultValue": "eastus-hub",
             "metadata": {
                 "description": "Name of an existing vWAN hub."
             }
@@ -60,13 +60,6 @@
             "defaultValue": "defaultRouteTable",
             "metadata": {
                 "description": "The existing vWAN hub route table to associated with the security vNet connection."
-            }
-        },
-        "HubPropagatedLabels": {
-            "type": "string",
-            "defaultValue": "default",
-            "metadata": {
-                "description": "A comma separated list of existing vWAN hub labels to propagate the security vNet connection."
             }
         }
     },
@@ -99,10 +92,7 @@
         "hub_name": "[parameters('HubName')]",
         "hub_connection_name": "[concat(variables('spoke_vnet_name'),'-conn')]",
 
-        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]",
-
-
-        "propagated_labels": "[parameters('HubPropagatedLabels')]"
+        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]"
 
 
     },
@@ -173,10 +163,7 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
-                                        "labels": [
-                                            "[variables('propagated_labels')]"
-                                        ]
-
+                                        "labels": []
                                     }
                                 },
                                 "remoteVirtualNetwork": {
