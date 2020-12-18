@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "WANName": {
-            "type": "string",
             "defaultValue": "virtual-wan",
+            "type": "String",
             "metadata": {
                 "description": "Name of the virtual WAN."
             }
         },
         "hubName": {
-            "type": "string",
             "defaultValue": "hub1",
+            "type": "String",
             "metadata": {
                 "description": "Name of the virtual hub. This virtual hub is created inside the virtual WAN."
             }
         },
         "hubAddressPrefix": {
-            "type": "string",
             "defaultValue": "10.10.0.0/24",
+            "type": "String",
             "metadata": {
                 "description": "Enter the hub's address prefix. This address prefix will be used as the address prefix for the hub's virtual network."
             }
@@ -55,7 +55,9 @@
             "properties": {
                 "virtualHubRouteTableV2s": [],
                 "addressPrefix": "[variables('hub_address_prefix')]",
-                "virtualRouterAsn": 65515,
+                "virtualWan": {
+                    "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
+                },
                 "sku": "Standard",
                 "routingState": "Provisioned"
             }
@@ -91,16 +93,16 @@
     ],
     "outputs": {
         "REGION": {
-            "value" : "[variables('wan_name')]",
-            "type": "string"
+            "type": "String",
+            "value": "[variables('wan_name')]"
         },
         "WAN_NAME": {
-            "value" : "[variables('hub_name')]",
-            "type": "string"
+            "type": "String",
+            "value": "[variables('hub_name')]"
         },
         "HUB_NAME": {
-            "value" : "[variables('location')]",
-            "type": "string"
+            "type": "String",
+            "value": "[variables('location')]"
         }
     }
 }
