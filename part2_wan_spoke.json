@@ -9,7 +9,7 @@
 
         "spokeNamePrefix": {
             "type": "string",
-            "defaultValue": "spoke",
+            "defaultValue": "wan-spoke",
             "metadata": {
                 "description": "Enter a naming prefix to append to the spoke resources created."
             }
@@ -50,7 +50,7 @@
         },
         "HubName": {
             "type": "string",
-            "defaultValue": "eastus-hub",
+            "defaultValue": "hub1",
             "metadata": {
                 "description": "Name of an existing vWAN hub."
             }
