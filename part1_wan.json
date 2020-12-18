@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "WANName": {
@@ -28,27 +28,26 @@
         "location": "[resourceGroup().location]",
         "api_version": "2020-05-01",
         "wan_name": "[parameters('WANName')]",
-        "wan_sku": "Standard",
         "hub_name": "[parameters('hubName')]",
         "hub_address_prefix": "[parameters('hubAddressPrefix')]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/virtualWans",
-            "name": "[variables('wan_name')]",
             "apiVersion": "[variables('api_version')]",
+            "name": "[variables('wan_name')]",
             "location": "[variables('location')]",
             "properties": {
-                "type": "[variables('wan_sku')]",
                 "disableVpnEncryption": false,
                 "allowBranchToBranchTraffic": true,
-                "office365LocalBreakoutCategory": "None"
+                "office365LocalBreakoutCategory": "None",
+                "type": "Standard"
             }
         },
         {
             "type": "Microsoft.Network/virtualHubs",
-            "name": "[variables('hub_name')]",
             "apiVersion": "[variables('api_version')]",
+            "name": "[variables('hub_name')]",
             "location": "[variables('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
@@ -56,7 +55,11 @@
             "properties": {
                 "virtualHubRouteTableV2s": [],
                 "addressPrefix": "[variables('hub_address_prefix')]",
-                "virtualRouterIps": [],
+                "virtualRouterAsn": 65515,
+                "virtualRouterIps": [
+                    "10.10.0.100",
+                    "10.10.0.101"
+                ],
                 "routeTable": {
                     "routes": []
                 },
