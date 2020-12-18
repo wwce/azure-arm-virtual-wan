@@ -56,16 +56,6 @@
                 "virtualHubRouteTableV2s": [],
                 "addressPrefix": "[variables('hub_address_prefix')]",
                 "virtualRouterAsn": 65515,
-                "virtualRouterIps": [
-                    "10.10.0.100",
-                    "10.10.0.101"
-                ],
-                "routeTable": {
-                    "routes": []
-                },
-                "virtualWan": {
-                    "id": "[resourceId('Microsoft.Network/virtualWans', variables('wan_name'))]"
-                },
                 "sku": "Standard",
                 "routingState": "Provisioned"
             }
