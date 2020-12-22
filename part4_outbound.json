@@ -15,37 +15,21 @@
         },
         "securityVnetName": {
             "type": "string",
-            "defaultValue": "paloaltonw-eastus-outbound-70681-vnet",
             "metadata": {
                 "description": "Name of the existing security vNet to connect to the hub."
             }
         },
         "securityVnetResourceGroup": {
             "type": "string",
-            "defaultValue": "paloaltonw-eastus-outbound-70681",
             "metadata": {
                 "description": "Name of the resource group that contains the security vNet."
             }
         },
         "HubName": {
             "type": "string",
-            "defaultValue": "eastus-hub",
+            "defaultValue": "hub1",
             "metadata": {
                 "description": "Name of an existing vWAN hub."
-            }
-        },
-        "ConnectionRoutePrefixes": {
-            "type": "string",
-            "defaultValue": "10.2.0.0/24, 10.2.1.0/24",
-            "metadata": {
-                "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
-            }
-        },
-        "VMSeriesInternalLBAddress": {
-            "type": "string",
-            "defaultValue": "10.0.2.100",
-            "metadata": {
-                "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
             }
         },
         "HubAssociatedRouteTable": {
@@ -55,40 +39,32 @@
                 "description": "The existing vWAN hub route table to associated with the security vNet connection."
             }
         },
-        "HubPropagatedRouteTables": {
+        "ConnectionRoutePrefixes": {
             "type": "string",
-            "defaultValue": "defaultRouteTable",
+            "defaultValue": "10.4.0.0/24, 10.5.0.0/24",
             "metadata": {
-                "description": "A comma separated list of existing vWAN hub route tables to propagate the security vNet connection."
+                "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
             }
         },
-        "HubPropagatedLabels": {
+        "VM-SeriesInternalLBAddress": {
             "type": "string",
-            "defaultValue": "",
             "metadata": {
-                "description": "A comma separated list of existing vWAN hub labels to propagate the security vNet connection."
+                "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
             }
         }
     },
     "variables": {
-        "global_resource_group": "[resourceGroup().name]",
-        "global_location": "[resourceGroup().location]",
-        "global_apiVersion": "2020-06-01",
-
+        "global_apiVersion": "2020-05-01",
         "vnet_name": "[parameters('securityVnetName')]",
         "vnet_rg": "[parameters('securityVnetResourceGroup')]",
         "wan_rg": "[parameters('WANResourceGroup')]",
         "hub_name": "[parameters('HubName')]",
-        "hub_connection_name": "[concat(variables('vnet_name'),'-connection')]",
-
+        "hub_connection_name": "[concat(variables('vnet_name'),'-conn')]",
         "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]",
-        "next_hop_ip": "[parameters('VMSeriesInternalLBAddress')]",
+        "next_hop_ip": "[parameters('VM-SeriesInternalLBAddress')]",
         "delimiter": [",", ";", " ," ],
         "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
-        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]", 
-
-        "propagated_tables": "[split(parameters('HubPropagatedRouteTables'),variables('delimiter'))]",
-        "propagated_labels": "[parameters('HubPropagatedLabels')]"
+        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]" 
     },
     "resources": [
         {
@@ -107,7 +83,7 @@
                     "resources": [
                         {
                             "type": "Microsoft.Network/virtualHubs/hubVirtualNetworkConnections",
-                            "apiVersion": "2020-05-01",
+                            "apiVersion": "[variables('global_apiVersion')]",
                             "name": "[concat(variables('hub_name'), '/', variables('hub_connection_name'))]",
                             "dependsOn": [],
                             "properties": {
@@ -116,21 +92,7 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
-                                        "labels": [
-                                            "[variables('propagated_labels')]"
-                                        ],
-
-
-                                        "copy": [
-                                            {
-                                                "name": "ids",
-                                                "count": "[length(variables('propagated_tables'))]",
-                                                "input": {
-                                                    "id": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), variables('propagated_tables')[copyIndex('ids')])]"
-                                                }
-                                            }
-                                        ]
-
+                                        "labels": []
                                     },
                                     "vnetRoutes": {
 
@@ -155,7 +117,7 @@
                                 },
                                 "allowHubToRemoteVnetTransit": true,
                                 "allowRemoteVnetToUseHubVnetGateways": true,
-                                "enableInternetSecurity": true
+                                "enableInternetSecurity": false
                             }
                         }
                     ],
