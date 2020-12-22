@@ -6,13 +6,6 @@
         "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
     },
     "parameters": {
-        "WANName": {
-            "type": "string",
-            "defaultValue": "virtual-wan",
-            "metadata": {
-                "description": "Name of the existing Virtual WAN."
-            }
-        },
         "WANResourceGroup": {
             "type": "string",
             "defaultValue": "virtual-wan-rg",
@@ -22,21 +15,19 @@
         },
         "securityVnetName": {
             "type": "string",
-            "defaultValue": "paloaltonw-eastus-vmseries-97884-vnet",
             "metadata": {
                 "description": "Name of the existing security vNet to connect to the hub."
             }
         },
         "securityVnetResourceGroup": {
             "type": "string",
-            "defaultValue": "paloaltonw-eastus-vmseries-97884",
             "metadata": {
                 "description": "Name of the resource group that contains the security vNet."
             }
         },
         "HubName": {
             "type": "string",
-            "defaultValue": "eastus-hub",
+            "defaultValue": "hub1",
             "metadata": {
                 "description": "Name of an existing vWAN hub."
             }
@@ -47,38 +38,17 @@
             "metadata": {
                 "description": "The existing vWAN hub route table to associated with the security vNet connection."
             }
-        },
-        "HubPropagatedRouteTables": {
-            "type": "string",
-            "defaultValue": "defaultRouteTable",
-            "metadata": {
-                "description": "A comma separated list of existing vWAN hub route tables to propagate the security vNet connection."
-            }
-        },
-        "HubPropagatedLabels": {
-            "type": "string",
-            "defaultValue": "default",
-            "metadata": {
-                "description": "A comma separated list of existing vWAN hub labels to propagate the security vNet connection."
-            }
         }
     },
     "variables": {
-        "global_resource_group": "[resourceGroup().name]",
-        "global_location": "[resourceGroup().location]",
-        "global_apiVersion": "2020-06-01",
-
+        "global_apiVersion": "2020-05-01",
         "vnet_name": "[parameters('securityVnetName')]",
         "vnet_rg": "[parameters('securityVnetResourceGroup')]",
         "wan_rg": "[parameters('WANResourceGroup')]",
         "hub_name": "[parameters('HubName')]",
-        "hub_connection_name": "[concat(variables('vnet_name'),'-connection')]",
+        "hub_connection_name": "[concat(variables('vnet_name'),'-conn')]",
+        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]"
 
-        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]",
-        "delimiter": [",", ";", " ," ],
-
-        "propagated_tables": "[split(parameters('HubPropagatedRouteTables'),variables('delimiter'))]",
-        "propagated_labels": "[parameters('HubPropagatedLabels')]"
     },
     "resources": [
         {
@@ -97,7 +67,7 @@
                     "resources": [
                         {
                             "type": "Microsoft.Network/virtualHubs/hubVirtualNetworkConnections",
-                            "apiVersion": "2020-05-01",
+                            "apiVersion": "[variables('global_apiVersion')]",
                             "name": "[concat(variables('hub_name'), '/', variables('hub_connection_name'))]",
                             "dependsOn": [],
                             "properties": {
@@ -106,21 +76,7 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
-                                        "labels": [
-                                            "[variables('propagated_labels')]"
-                                        ],
-
-
-                                        "copy": [
-                                            {
-                                                "name": "ids",
-                                                "count": "[length(variables('propagated_tables'))]",
-                                                "input": {
-                                                    "id": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), variables('propagated_tables')[copyIndex('ids')])]"
-                                                }
-                                            }
-                                        ]
-
+                                        "labels": []
                                     }
                                 },
                                 "remoteVirtualNetwork": {
