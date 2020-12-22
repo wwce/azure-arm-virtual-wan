@@ -76,7 +76,12 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
-                                        "labels": []
+                                        "labels": [],
+                                        "ids": [
+                                            {
+                                                "id": "[variables('hub_route_table_associated')]"
+                                            }
+                                        ]
                                     }
                                 },
                                 "remoteVirtualNetwork": {
