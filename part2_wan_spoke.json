@@ -163,6 +163,7 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
+                                        "id": "[variables('hub_route_table_associated')]"
                                         "labels": []
                                     }
                                 },
