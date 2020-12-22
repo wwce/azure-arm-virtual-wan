@@ -9,21 +9,21 @@
 
         "spokeNamePrefix": {
             "type": "string",
-            "defaultValue": "wan-spoke100",
+            "defaultValue": "wan-spoke",
             "metadata": {
                 "description": "Enter a naming prefix to append to the spoke resources created."
             }
         },
         "spokeVNETPrefix": {
             "type": "string",
-            "defaultValue": "10.203.0.0/24",
+            "defaultValue": "10.4.0.0/24",
             "metadata": {
                 "description": "Enter a IP prefix for the spoke VNET."
             }
         },
         "spokeSubnetPrefix": {
             "type": "string",
-            "defaultValue": "10.203.0.0/28",
+            "defaultValue": "10.4.0.0/28",
             "metadata": {
                 "description": "Enter a IP prefix for the spoke VNET's subnet."
             }
