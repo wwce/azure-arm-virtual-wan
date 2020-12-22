@@ -65,6 +65,7 @@
         "delimiter": [",", ";", " ," ],
         "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
         "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]" 
+
     },
     "resources": [
         {
@@ -92,7 +93,12 @@
                                         "id": "[variables('hub_route_table_associated')]"
                                     },
                                     "propagatedRouteTables": {
-                                        "labels": []
+                                        "labels": [],
+                                        "ids": [
+                                            {
+                                                "id": "[variables('hub_route_table_associated')]"
+                                            }
+                                        ]
                                     },
                                     "vnetRoutes": {
 
