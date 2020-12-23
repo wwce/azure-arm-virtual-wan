@@ -351,7 +351,7 @@
         }
     ],
     "outputs": {
-        "SPOKE-ADDRESS": {
+        "spoke-address": {
             "value": "[reference(variables('spoke_vm_nic_name')).ipConfigurations[0].properties.privateIPAddress]",
             "type": "string"
         }
