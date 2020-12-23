@@ -37,7 +37,6 @@
         },
         "spokePassword": {
             "type": "securestring",
-            "defaultValue": "Pal0Alto0@123",
             "metadata": {
                 "description": "Enter a password for the spoke test VM."
             }
