@@ -19,12 +19,6 @@
                 "description": "Name of the existing security vNet to connect to the hub."
             }
         },
-        "securityVnetResourceGroup": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the resource group that contains the security vNet."
-            }
-        },
         "HubName": {
             "type": "string",
             "defaultValue": "hub1",
@@ -36,7 +30,14 @@
             "type": "string",
             "defaultValue": "defaultRouteTable",
             "metadata": {
-                "description": "The existing vWAN hub route table to associated with the security vNet connection."
+                "description": "The existing vWAN hub route table to associate with the VNET connection."
+            }
+        },
+        "HubPropagatedRouteTable": {
+            "type": "String",
+            "defaultValue": "defaultRouteTable",
+            "metadata": {
+                "description": "The existing vWAN hub route table to propagate the VNET connection."
             }
         },
         "ConnectionRoutePrefixes": {
@@ -54,18 +55,20 @@
         }
     },
     "variables": {
-        "global_apiVersion": "2020-05-01",
+        "global_apiVersion": "2020-06-01",
+        "global_resource_group": "[resourceGroup().name]",
         "vnet_name": "[parameters('securityVnetName')]",
-        "vnet_rg": "[parameters('securityVnetResourceGroup')]",
+
         "wan_rg": "[parameters('WANResourceGroup')]",
         "hub_name": "[parameters('HubName')]",
         "hub_connection_name": "[concat(variables('vnet_name'),'-conn')]",
-        "hub_route_table_associated": "[resourceId('Microsoft.Network/virtualHubs/hubRouteTables', variables('hub_name'), parameters('HubAssociatedRouteTable'))]",
-        "next_hop_ip": "[parameters('VM-SeriesInternalLBAddress')]",
-        "delimiter": [",", ";", " ," ],
-        "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
-        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]" 
+        "hub_route_table_associated": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubRouteTables', parameters('HubName'), parameters('HubAssociatedRouteTable'))]",
+        "hub_route_table_propagated": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubRouteTables', parameters('HubName'), parameters('HubPropagatedRouteTable'))]",
 
+        "next_hop_ip": "[parameters('VM-SeriesInternalLBAddress')]",
+        "delimiter": [ ",", ";", " ," ],
+        "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
+        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]"
     },
     "resources": [
         {
@@ -73,6 +76,7 @@
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('wan_rg')]",
             "name": "CREATE_HUB_CONNECTION",
+            "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
                 "parameters": {},
@@ -96,12 +100,11 @@
                                         "labels": [],
                                         "ids": [
                                             {
-                                                "id": "[variables('hub_route_table_associated')]"
+                                                "id": "[variables('hub_route_table_propagated')]"
                                             }
                                         ]
                                     },
                                     "vnetRoutes": {
-
                                         "copy": [
                                             {
                                                 "name": "staticRoutes",
@@ -119,11 +122,11 @@
                                     }
                                 },
                                 "remoteVirtualNetwork": {
-                                    "id": "[concat(resourceId(variables('vnet_rg'), 'Microsoft.Network/virtualNetworks/', variables('vnet_name')))]"
+                                    "id": "[resourceId(variables('global_resource_group'), 'Microsoft.Network/virtualNetworks', variables('vnet_name'))]"
                                 },
                                 "allowHubToRemoteVnetTransit": true,
                                 "allowRemoteVnetToUseHubVnetGateways": true,
-                                "enableInternetSecurity": false
+                                "enableInternetSecurity": true
                             }
                         }
                     ],
