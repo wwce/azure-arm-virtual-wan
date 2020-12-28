@@ -8,21 +8,21 @@
     "parameters": {
         "securityVNETResourceGroup": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "paloaltonw-outbound-eastus-6945a",
             "metadata": {
                 "description": "Name of the resource group that contains the existing security VNET."
             }
         },
         "securityVNETName": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "paloaltonw-outbound-eastus-6945a-vnet",
             "metadata": {
                 "description": "Name of the existing security VNET that contains the VM-Series firewalls."
             }
         },
         "EgressPrivateIP": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "10.0.0.74",
             "metadata": {
                 "description": "IP address of VM-Series internal load balancer.  This IP will be added as the next hop IP in the spoke VNETs route table."
             }
@@ -100,140 +100,85 @@
     },
     "resources": [
         {
-            "comments": "CREATE VIRTUAL NETWORK WITH SUBNET",
-            "type": "Microsoft.Resources/deployments",
-            "name": "CREATE_VNET",
+            "type": "Microsoft.Network/routeTables",
+            "name": "[variables('rtb_name')]",
             "apiVersion": "[variables('global_apiVersion')]",
-            "resourceGroup": "[variables('global_resource_group')]",
+            "location": "[variables('global_location')]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-                        {
-                            "type": "Microsoft.Network/routeTables",
-                            "name": "[variables('rtb_name')]",
-                            "apiVersion": "[variables('global_apiVersion')]",
-                            "location": "[resourceGroup().location]",
-                            "properties": {
-                                "routes": [
-                                    {
-                                        "name": "route0",
-                                        "properties": {
-                                            "addressPrefix": "[variables('rtb_route0_cidr')]",
-                                            "nextHopType": "VirtualAppliance",
-                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
-                                        }
-                                    },
-                                    {
-                                        "name": "route1",
-                                        "properties": {
-                                            "addressPrefix": "[variables('rtb_route1_cidr')]",
-                                            "nextHopType": "VirtualAppliance",
-                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
-                                        }
-                                    },
-                                    {
-                                        "name": "route2",
-                                        "properties": {
-                                            "addressPrefix": "[variables('rtb_route2_cidr')]",
-                                            "nextHopType": "VirtualAppliance",
-                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
-                                        }
-                                    },
-                                    {
-                                        "name": "route3",
-                                        "properties": {
-                                            "addressPrefix": "[variables('rtb_route3_cidr')]",
-                                            "nextHopType": "VirtualAppliance",
-                                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "name": "[variables('spoke_vnet_name')]",
-                            "apiVersion": "[variables('global_apiVersion')]",
-                            "location": "[variables('global_location')]",
-                            "dependsOn": [ "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]" ],
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "[variables('spoke_vnet_cidr')]"
-                                    ]
-                                },
-                                "subnets": [
-                                    {
-                                        "name": "[variables('spoke_vnet_subnet0_name')]",
-                                        "properties": {
-                                            "addressPrefix": "[variables('spoke_vnet_subnet0_cidr')]",
-                                            "routeTable": {
-                                                "id": "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "apiVersion": "[variables('global_apiVersion')]",
-                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-                            "name": "[concat(variables('spoke_vnet_name'), '/', variables('security_vnet_name'), '-peer' )]",
-                            "location": "[variables('global_location')]",
-                            "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]" ],
-                            "properties": {
-                                "allowVirtualNetworkAccess": true,
-                                "allowForwardedTraffic": true,
-                                "allowGatewayTransit": true,
-                                "useRemoteGateways": false,
-                                "remoteVirtualNetwork": {
-                                    "id": "[resourceId(variables('security_vnet_rg'), 'Microsoft.Network/virtualNetworks', variables('security_vnet_name'))]"
-                                }
-                            }
+                "routes": [
+                    {
+                        "name": "route0",
+                        "properties": {
+                            "addressPrefix": "[variables('rtb_route0_cidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
                         }
-                    ]
-                }
+                    },
+                    {
+                        "name": "route1",
+                        "properties": {
+                            "addressPrefix": "[variables('rtb_route1_cidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                        }
+                    },
+                    {
+                        "name": "route2",
+                        "properties": {
+                            "addressPrefix": "[variables('rtb_route2_cidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                        }
+                    },
+                    {
+                        "name": "route3",
+                        "properties": {
+                            "addressPrefix": "[variables('rtb_route3_cidr')]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
+                        }
+                    }
+                ]
             }
         },
         {
-            "comments": "CREATE SECURITY VNET TO SPOKE PEER",
-            "type": "Microsoft.Resources/deployments",
-            "name": "CREATE_PEER_LINK",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('spoke_vnet_name')]",
             "apiVersion": "[variables('global_apiVersion')]",
-            "resourceGroup": "[variables('security_vnet_rg')]",
-            "dependsOn": [
-                "CREATE_VNET"
-            ],
+            "location": "[variables('global_location')]",
+            "dependsOn": [ "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]" ],
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": [
-
-
-                        {
-                            "apiVersion": "[variables('global_apiVersion')]",
-                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-                            "name": "[concat(variables('security_vnet_name'), '/', variables('spoke_vnet_name'), '-peer')]",
-                            "location": "[variables('global_location')]",
-                            "dependsOn": [],
-                            "properties": {
-                                "allowVirtualNetworkAccess": true,
-                                "allowForwardedTraffic": true,
-                                "allowGatewayTransit": true,
-                                "useRemoteGateways": false,
-                                "remoteVirtualNetwork": {
-                                    "id": "[resourceId(variables('global_resource_group'), 'Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
-                                }
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('spoke_vnet_cidr')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('spoke_vnet_subnet0_name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('spoke_vnet_subnet0_cidr')]",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables', variables('rtb_name'))]"
                             }
                         }
-
-
-                    ]
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('global_apiVersion')]",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(variables('spoke_vnet_name'), '/', variables('security_vnet_name'), '-peer' )]",
+            "location": "[variables('global_location')]",
+            "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]" ],
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": true,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId(variables('security_vnet_rg'), 'Microsoft.Network/virtualNetworks', variables('security_vnet_name'))]"
                 }
             }
         },
@@ -288,7 +233,10 @@
             "name": "[variables('spoke_vm_nic_name')]",
             "apiVersion": "[variables('spoke_vm_apiVersion')]",
             "location": "[variables('global_location')]",
-            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]" ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -315,6 +263,9 @@
             "name": "[variables('spoke_vm_name')]",
             "apiVersion": "[variables('spoke_vm_apiVersion')]",
             "location": "[variables('global_location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('spoke_vm_nic_name'))]"
+            ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[variables('spoke_vm_vmSize')]"
@@ -356,10 +307,46 @@
                         }
                     ]
                 }
-            },
+            }
+        },
+        {
+            "comments": "CREATE SECURITY VNET TO SPOKE PEER",
+            "type": "Microsoft.Resources/deployments",
+            "name": "CREATE_PEER_LINK",
+            "apiVersion": "[variables('global_apiVersion')]",
+            "resourceGroup": "[variables('security_vnet_rg')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('spoke_vm_nic_name'))]"
-            ]
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+
+
+                        {
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                            "name": "[concat(variables('security_vnet_name'), '/', variables('spoke_vnet_name'), '-peer')]",
+                            "location": "[variables('global_location')]",
+                            "dependsOn": [],
+                            "properties": {
+                                "allowVirtualNetworkAccess": true,
+                                "allowForwardedTraffic": true,
+                                "allowGatewayTransit": true,
+                                "useRemoteGateways": false,
+                                "remoteVirtualNetwork": {
+                                    "id": "[resourceId(variables('global_resource_group'), 'Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
+                                }
+                            }
+                        }
+
+
+                    ]
+                }
+            }
         }
     ],
     "outputs": {
