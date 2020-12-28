@@ -47,7 +47,7 @@
                 "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
             }
         },
-        "VM-SeriesInternalLBAddress": {
+        "EgressPrivateIP": {
             "type": "string",
             "metadata": {
                 "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
@@ -65,7 +65,7 @@
         "hub_route_table_associated": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubRouteTables', parameters('HubName'), parameters('HubAssociatedRouteTable'))]",
         "hub_route_table_propagated": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubRouteTables', parameters('HubName'), parameters('HubPropagatedRouteTable'))]",
 
-        "next_hop_ip": "[parameters('VM-SeriesInternalLBAddress')]",
+        "next_hop_ip": "[parameters('EgressPrivateIP')]",
         "delimiter": [ ",", ";", " ," ],
         "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
         "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]"
