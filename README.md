@@ -53,11 +53,11 @@ A dedicated virtual network with a set of VM-Series firewalls must exist prior t
 
 A dedicated virtual network must exist with a set of VM-Series firewalls prior to proceeding.  This virutal netwokr should be separate from teh virtual network used in part 3.  In this step, you will connect the existing outbound VM-Series firewalls to the virtual hub.
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_outbound.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_vnet_spoke.json)
 
 #### Part 5:  Create Local Spoke VNET peered to outbound firewalls
 
  Part 4 creates a demo VNET that is peered (via vNet Peering) to the outbound firewall virtual network.  A route table is created to direct all traffic from the locally connected spoke to the outbound firewall's interal load balancer.  This will force traffic through the outbound scale set before reaching its destination. 
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart5_vnet_spoke.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart5_outbound.json)
 
