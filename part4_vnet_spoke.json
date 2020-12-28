@@ -8,21 +8,18 @@
     "parameters": {
         "securityVNETResourceGroup": {
             "type": "string",
-            "defaultValue": "paloaltonw-outbound-eastus-6945a",
             "metadata": {
                 "description": "Name of the resource group that contains the existing security VNET."
             }
         },
         "securityVNETName": {
             "type": "string",
-            "defaultValue": "paloaltonw-outbound-eastus-6945a-vnet",
             "metadata": {
                 "description": "Name of the existing security VNET that contains the VM-Series firewalls."
             }
         },
         "EgressPrivateIP": {
             "type": "string",
-            "defaultValue": "10.0.0.74",
             "metadata": {
                 "description": "IP address of VM-Series internal load balancer.  This IP will be added as the next hop IP in the spoke VNETs route table."
             }
