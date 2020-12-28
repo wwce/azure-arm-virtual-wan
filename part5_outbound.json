@@ -42,7 +42,7 @@
         },
         "ConnectionRoutePrefixes": {
             "type": "string",
-            "defaultValue": "10.4.0.0/24, 10.5.0.0/24",
+            "defaultValue": "10.3.0.0/16",
             "metadata": {
                 "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
             }
