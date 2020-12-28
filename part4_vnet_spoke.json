@@ -6,14 +6,6 @@
         "author": "Matt McLimans (mmclimans@paloaltonetworks.com)"
     },
     "parameters": {
-
-        "securityVNETName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of the existing security VNET that contains the VM-Series firewalls."
-            }
-        },
         "securityVNETResourceGroup": {
             "type": "string",
             "defaultValue": "",
@@ -21,7 +13,14 @@
                 "description": "Name of the resource group that contains the existing security VNET."
             }
         },
-        "VMSeriesInternalLBAddress": {
+        "securityVNETName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the existing security VNET that contains the VM-Series firewalls."
+            }
+        },
+        "VMSeriesInternalLB-IP": {
             "type": "string",
             "defaultValue": "",
             "metadata": {
@@ -97,9 +96,7 @@
         "rtb_route1_cidr": "10.0.0.0/8",
         "rtb_route2_cidr": "192.168.0.0/16",
         "rtb_route3_cidr": "172.16.0.0/12",
-        "rtb_next_hop_ip": "[parameters('VMSeriesInternalLBAddress')]"
-
-
+        "rtb_next_hop_ip": "[parameters('VMSeriesInternalLB-IP')]"
     },
     "resources": [
         {
