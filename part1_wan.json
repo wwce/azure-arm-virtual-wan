@@ -94,15 +94,15 @@
     "outputs": {
         "region": {
             "type": "String",
-            "value": "[variables('wan_name')]"
+            "value": "[variables('location')]"
         },
         "wan-name": {
             "type": "String",
-            "value": "[variables('hub_name')]"
+            "value": "[variables('wan_name')]"
         },
         "hub-name": {
             "type": "String",
-            "value": "[variables('location')]"
+            "value": "[variables('hub_name')]"
         }
     }
 }
