@@ -99,8 +99,7 @@
                                 "enableInternetSecurity": true
                             }
                         }
-                    ],
-                    "outputs": {}
+                    ]
                 }
             }
         }
