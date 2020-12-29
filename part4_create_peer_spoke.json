@@ -18,10 +18,30 @@
                 "description": "Name of the existing security VNET that contains the VM-Series firewalls."
             }
         },
+        "securityVNETConnectionName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the security VNET's virtual hub connection"
+            }
+        },
         "EgressPrivateIP": {
             "type": "string",
             "metadata": {
                 "description": "IP address of VM-Series internal load balancer.  This IP will be added as the next hop IP in the spoke VNETs route table."
+            }
+        },
+        "WANResourceGroup": {
+            "type": "string",
+            "defaultValue": "virtual-wan-rg",
+            "metadata": {
+                "description": "Name of the virtual WAN."
+            }
+        },
+        "hubName": {
+            "type": "string",
+            "defaultValue": "hub1",
+            "metadata": {
+                "description": "Name of the virtual hub. This virtual hub is created inside the virtual WAN."
             }
         },
         "spokeNamePrefix": {
@@ -53,6 +73,7 @@
             }
         },
         "spokePassword": {
+            "defaultValue": "Pal0Alt0@123",
             "type": "securestring",
             "metadata": {
                 "description": "Enter a password for the spoke test VM."
@@ -61,7 +82,7 @@
     },
     "variables": {
         "global_resource_group": "[resourceGroup().name]",
-        "global_apiVersion": "2019-09-01",
+        "global_apiVersion": "2020-05-01",
         "global_location": "[resourceGroup().location]",
 
         "security_vnet_name": "[parameters('securityVNETName')]",
@@ -87,10 +108,11 @@
         "spoke_vm_name": "[concat(variables('spoke_prefix'),'-vm')]",
         "spoke_vm_nic_name": "[concat(variables('spoke_prefix'), '-nic0')]",
         "spoke_vm_nsg_name": "[concat(variables('spoke_prefix'), '-nsg')]",
-        "spoke_vm_pip_name": "[concat(variables('spoke_vm_name'), '-pip')]",
-
+        "security_vnet_conn_name": "[parameters('securityVNETConnectionName')]",
+        "hub_name": "[parameters('hubName')]",
+        "wan_rg": "[parameters('WANResourceGroup')]",
+        "hub_route_name": "[concat(variables('spoke_prefix'), '-route0')]",
         "rtb_name": "[concat(variables('spoke_prefix'),'-rtb')]",
-        "rtb_route0_cidr": "0.0.0.0/0",
         "rtb_route1_cidr": "10.0.0.0/8",
         "rtb_route2_cidr": "192.168.0.0/16",
         "rtb_route3_cidr": "172.16.0.0/12",
@@ -218,27 +240,12 @@
             }
         },
         {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('spoke_vm_pip_name')]",
-            "apiVersion": "[variables('spoke_vm_apiVersion')]",
-            "location": "[variables('global_location')]",
-            "sku": {
-                "name": "Standard"
-            },
-            "properties": {
-                "publicIPAddressVersion": "IPv4",
-                "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 4
-            }
-        },
-        {
             "comments": "CREATE_NIC",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('spoke_vm_nic_name')]",
             "apiVersion": "[variables('spoke_vm_apiVersion')]",
             "location": "[variables('global_location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIpAddresses', variables('spoke_vm_pip_name'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
             ],
@@ -249,9 +256,6 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "privateIPAddressVersion": "IPv4",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('spoke_vm_pip_name'))]"
-                            },
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name')), '/subnets/', variables('spoke_vnet_subnet0_name'))]"
                             },
@@ -355,12 +359,47 @@
                     ]
                 }
             }
+        },
+        {
+            "comments": "CREATE VIRTUAL HUB ROUTE",
+            "type": "Microsoft.Resources/deployments",
+            "name": "CREATE_HUB_ROUTE",
+            "apiVersion": "[variables('global_apiVersion')]",
+            "resourceGroup": "[variables('wan_rg')]",
+            "dependsOn": [
+                "CREATE_PEER_LINK"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualHubs/hubRouteTables",
+                            "apiVersion": "[variables('global_apiVersion')]",
+                            "name": "[concat(variables('hub_name'), '/defaultRouteTable')]",
+                            "dependsOn": [],
+                            "properties": {
+                                "routes": [
+                                    {
+                                        "name": "[variables('hub_route_name')]",
+                                        "destinationType": "CIDR",
+                                        "destinations": [
+                                            "[variables('spoke_vnet_cidr')]"
+                                        ],
+                                        "nextHopType": "ResourceId",
+                                        "nextHop": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections', variables('hub_name'), variables('security_vnet_conn_name'))]"
+                                    }
+                                ],
+                                "labels": [
+                                    "default"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
         }
-    ],
-    "outputs": {
-        "ssh-to-vm": {
-            "value" : "[concat('ssh ', variables('spoke_vm_user'), '@', reference(variables('spoke_vm_pip_name')).ipAddress)]",
-            "type": "string"
-        }
-    }
+    ]
 }

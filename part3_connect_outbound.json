@@ -14,10 +14,15 @@
             }
         },
         "securityVnetName": {
-            "defaultValue": "paloaltonw-outbound-eastus-6945a-vnet",
             "type": "string",
             "metadata": {
                 "description": "Name of the existing security vNet to connect to the hub."
+            }
+        },
+        "EgressPrivateIP": {
+            "type": "string",
+            "metadata": {
+                "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
             }
         },
         "HubName": {
@@ -39,13 +44,6 @@
             "defaultValue": "defaultRouteTable",
             "metadata": {
                 "description": "The existing vWAN hub route table to propagate the VNET connection."
-            }
-        },
-        "EgressPrivateIP": {
-            "defaultValue": "10.0.0.74",
-            "type": "string",
-            "metadata": {
-                "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
             }
         }
     },
@@ -141,8 +139,8 @@
     ],
     "outputs": {
         "security-vnet-connection-name": {
-            "value": "[variables('hub_connection_name')]",
-            "type": "string"
+            "type": "string",
+            "value": "[variables('hub_connection_name')]"
         }
     }
 }

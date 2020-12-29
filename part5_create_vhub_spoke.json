@@ -351,8 +351,8 @@
     ],
     "outputs": {
         "ssh-to-spoke-vm": {
-            "value" : "[concat('ssh ', variables('spoke_vm_user'), '@', reference(variables('spoke_vm_pip_name')).ipAddress)]",
-            "type": "string"
+            "type": "string",
+            "value" : "[concat('ssh ', variables('spoke_vm_user'), '@', reference(variables('spoke_vm_pip_name')).ipAddress)]"
         }
 
     }
