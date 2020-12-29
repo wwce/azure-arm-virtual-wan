@@ -350,9 +350,13 @@
         }
     ],
     "outputs": {
-        "ssh-to-spoke-vm": {
+        "ssh-to-spoke": {
             "type": "string",
             "value" : "[concat('ssh ', variables('spoke_vm_user'), '@', reference(variables('spoke_vm_pip_name')).ipAddress)]"
+        },
+        "spoke-address": {
+            "value": "[reference(variables('spoke_vm_nic_name')).ipConfigurations[0].properties.privateIPAddress]",
+            "type": "string"
         }
 
     }
