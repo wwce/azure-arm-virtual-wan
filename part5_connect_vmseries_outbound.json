@@ -14,6 +14,7 @@
             }
         },
         "securityVnetName": {
+            "defaultValue": "paloaltonw-outbound-eastus-6945a-vnet",
             "type": "string",
             "metadata": {
                 "description": "Name of the existing security vNet to connect to the hub."
@@ -40,14 +41,8 @@
                 "description": "The existing vWAN hub route table to propagate the VNET connection."
             }
         },
-        "ConnectionRoutePrefixes": {
-            "type": "string",
-            "defaultValue": "10.3.0.0/16",
-            "metadata": {
-                "description": "Destination prefixes to add to the security VNets hub connection.  Traffic destined to these ranges will be directed to the VM-Series."
-            }
-        },
         "EgressPrivateIP": {
+            "defaultValue": "10.0.0.74",
             "type": "string",
             "metadata": {
                 "description": "The IP of the internal load balancer frontending the VM-Series.  Traffic destined to/from vWAN will be directed to this address."
@@ -55,7 +50,7 @@
         }
     },
     "variables": {
-        "global_apiVersion": "2020-06-01",
+        "global_apiVersion": "2020-05-01",
         "global_resource_group": "[resourceGroup().name]",
         "vnet_name": "[parameters('securityVnetName')]",
 
@@ -66,9 +61,9 @@
         "hub_route_table_propagated": "[resourceId(variables('wan_rg'),'Microsoft.Network/virtualHubs/hubRouteTables', parameters('HubName'), parameters('HubPropagatedRouteTable'))]",
 
         "next_hop_ip": "[parameters('EgressPrivateIP')]",
-        "delimiter": [ ",", ";", " ," ],
-        "next_hop_prefixes_trim": "[replace(parameters('ConnectionRoutePrefixes'),' ', '')]",
-        "next_hop_prefixes": "[split(variables('next_hop_prefixes_trim'),variables('delimiter'))]"
+        "rtb_route1_cidr": "10.0.0.0/8",
+        "rtb_route2_cidr": "192.168.0.0/16",
+        "rtb_route3_cidr": "172.16.0.0/12"
     },
     "resources": [
         {
@@ -105,18 +100,27 @@
                                         ]
                                     },
                                     "vnetRoutes": {
-                                        "copy": [
+                                        "staticRoutes": [
                                             {
-                                                "name": "staticRoutes",
-                                                "count": "[length(variables('next_hop_prefixes'))]",
-                                                "input": {
-                                                    "name": "[concat('route-', copyIndex('staticRoutes'))]",
-                                                    "addressPrefixes": [
-                                                        "[variables('next_hop_prefixes')[copyIndex('staticRoutes')]]"
-                                                    ],
-                                                    "nextHopIpAddress": "[variables('next_hop_ip')]"
-
-                                                }
+                                                "name": "route0",
+                                                "addressPrefixes": [
+                                                    "[variables('rtb_route1_cidr')]"
+                                                ],
+                                                "nextHopIpAddress": "[variables('next_hop_ip')]"
+                                            },
+                                            {
+                                                "name": "route1",
+                                                "addressPrefixes": [
+                                                    "[variables('rtb_route2_cidr')]"
+                                                ],
+                                                "nextHopIpAddress": "[variables('next_hop_ip')]"
+                                            },
+                                            {
+                                                "name": "route2",
+                                                "addressPrefixes": [
+                                                    "[variables('rtb_route3_cidr')]"
+                                                ],
+                                                "nextHopIpAddress": "[variables('next_hop_ip')]"
                                             }
                                         ]
                                     }
@@ -134,5 +138,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "security-vnet-connection-name": {
+            "value": "[variables('hub_connection_name')]",
+            "type": "string"
+        }
+    }
 }
