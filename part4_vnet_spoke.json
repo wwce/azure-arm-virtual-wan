@@ -105,14 +105,6 @@
             "properties": {
                 "routes": [
                     {
-                        "name": "route0",
-                        "properties": {
-                            "addressPrefix": "[variables('rtb_route0_cidr')]",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[variables('rtb_next_hop_ip')]"
-                        }
-                    },
-                    {
                         "name": "route1",
                         "properties": {
                             "addressPrefix": "[variables('rtb_route1_cidr')]",
