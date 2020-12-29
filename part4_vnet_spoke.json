@@ -87,6 +87,7 @@
         "spoke_vm_name": "[concat(variables('spoke_prefix'),'-vm')]",
         "spoke_vm_nic_name": "[concat(variables('spoke_prefix'), '-nic0')]",
         "spoke_vm_nsg_name": "[concat(variables('spoke_prefix'), '-nsg')]",
+        "spoke_vm_pip_name": "[concat(variables('spoke_vm_name'), '-pip')]",
 
         "rtb_name": "[concat(variables('spoke_prefix'),'-rtb')]",
         "rtb_route0_cidr": "0.0.0.0/0",
@@ -225,14 +226,29 @@
             }
         },
         {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('spoke_vm_pip_name')]",
+            "apiVersion": "[variables('spoke_vm_apiVersion')]",
+            "location": "[variables('global_location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4
+            }
+        },
+        {
             "comments": "CREATE_NIC",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('spoke_vm_nic_name')]",
             "apiVersion": "[variables('spoke_vm_apiVersion')]",
             "location": "[variables('global_location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]"
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('spoke_vm_pip_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spoke_vm_nsg_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -240,11 +256,14 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAddressVersion": "IPv4",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('spoke_vm_pip_name'))]"
+                            },
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('spoke_vnet_name')), '/subnets/', variables('spoke_vnet_subnet0_name'))]"
                             },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4"
+                            "primary": true
                         }
                     }
                 ],
@@ -347,8 +366,8 @@
         }
     ],
     "outputs": {
-        "spoke-address": {
-            "value": "[reference(variables('spoke_vm_nic_name')).ipConfigurations[0].properties.privateIPAddress]",
+        "ssh-to-vm": {
+            "value" : "[concat('ssh ', variables('spoke_vm_user'), '@', reference(variables('spoke_vm_pip_name')).ipAddress)]",
             "type": "string"
         }
     }
