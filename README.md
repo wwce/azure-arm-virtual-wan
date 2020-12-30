@@ -93,7 +93,6 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 </br>
 </br>
 </br>
-</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_create_peer_spoke.json)
 </br>
 </br>
