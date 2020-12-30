@@ -68,6 +68,7 @@ Connects an existing VNET that contains a dedicated inbound set of VM-Series fir
 </br>
 </br>
 </br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart2_connect_inbound.json)
 </br>
 </br>
@@ -93,9 +94,6 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 </br>
 </br>
 </br>
-</br>
-</br>
-</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_create_peer_spoke.json)
 </br>
 </br>
@@ -103,7 +101,6 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png"> Part 5:  Create Virtual Hub Spoke VNET
 Creates a spoke VNET that is directly connected to the virtual hub created in part 1.  This VNET is used to demonstrate/test internet inbound traffic through the inbound VM-Series and also lateral traffic through the outbound VM-Series. 
-</br>
 </br>
 </br>
 </br>
