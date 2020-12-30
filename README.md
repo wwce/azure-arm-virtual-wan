@@ -44,9 +44,7 @@ The following items are required prior to launching the build.
 
 ##  Guide
 
-
-
-### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png"> Part 1:  Create Virtual WAN & Virtual Hub
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png"> Part 1:  Create Virtual WAN & Virtual Hub
 
 In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a Virtual Hub, you can skip this step and proceed to part 2. 
 </br>
@@ -57,9 +55,7 @@ In this part, a Virtual WAN is created with a virtual hub.  The hub will be used
 </br>
 </br>
 
-<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png" alt="drawing" width="100"/>
-
-### Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png"> Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
 Connects an existing VNET that contains a dedicated inbound set of VM-Series firewalls to the virtual hub created in part 1.
 </br>
 </br>
@@ -69,10 +65,7 @@ Connects an existing VNET that contains a dedicated inbound set of VM-Series fir
 </br>
 </br>
 
-
-<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part3.png" alt="drawing" width="500"/>
-
-### Part 3:  Connect Outbound VM-Series Scale Set to the Virtual Hub
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part3.png"> Part 3:  Connect Outbound VM-Series Scale Set to the Virtual Hub
 Connects an existing VNET that contains a dedicated outbound set of VM-Series firewalls to the virtual hub created in Part 1.
 </br>
 </br>
@@ -82,10 +75,7 @@ Connects an existing VNET that contains a dedicated outbound set of VM-Series fi
 </br>
 </br>
 
-
-<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png" alt="drawing" width="500"/>
-
-### Part 4:  Create Local Spoke VNET
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png"> Part 4:  Create Local Spoke VNET
 Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series VNET.  A route table is created to direct all traffic from the spoke VNET to the outbound firewall's interal load balancer.  A route is also added to the virtual hub's route table.  This route will direct virtual WAN traffic destinted to the spoke VNET through the outbound VM-Series VNET connection that was created in part 3.   
 </br>
 </br>
@@ -95,9 +85,7 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 </br>
 </br>
 
-<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png" alt="drawing" width="500"/>
-
-### Part 5:  Create Virtual Hub Spoke VNET
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png"> Part 5:  Create Virtual Hub Spoke VNET
 Creates a spoke VNET that is directly connected to the virtual hub created in part 1.  This VNET is used to demonstrate/test internet inbound traffic through the inbound VM-Series and also lateral traffic through the outbound VM-Series. 
 </br>
 </br>
