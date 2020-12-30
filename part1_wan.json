@@ -96,6 +96,10 @@
             "type": "String",
             "value": "[variables('location')]"
         },
+        "wan-rg": {
+            "type": "String",
+            "value": "[resourceGroup().name]"
+        },
         "wan-name": {
             "type": "String",
             "value": "[variables('wan_name')]"
