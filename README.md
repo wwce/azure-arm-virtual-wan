@@ -38,7 +38,7 @@ The following items are required prior to launching the build.
     - Azure Plugin 3.0 or greater
 3.  Inbound & Outbound VM-Series scale set within a dedicated VNETs.
 
-**If you do not have the VM-Series deployed, please see [Deployment Guide](https://github.com/wwce/azure-arm-virtual-wan/main/GUIDE.pdf) for how-to.**
+**If you do not have the VM-Series deployed, please see [Deployment Guide](https://github.com/wwce/azure-arm-virtual-wan/blob/main/GUIDE.pdf) for how-to.**
 
 </br>
 
