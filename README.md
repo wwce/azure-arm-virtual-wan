@@ -5,23 +5,28 @@ Secure Azure Virtual WAN traffic with Palo Alto Networks VM-Series firewalls.
 
 This build illustrates how to secure Azure Virtual WAN traffic with VM-Series scale sets. The build is broken down into 5 Parts.  Depending on existing Azure resources, certain parts may not be required.
 
-Part 1. Create Virtual WAN & Virtual Hub </br>
-Part 2. Connect VM-Series Inbound Scale Set to the Virtual Hub </br>
-Part 3. Connect VM-Series Outbound Scale Set to the Virtual Hub </br>
-Part 4. Create Local Spoke VNET </br>
-Part 5. Create Virtual Hub Spoke VNET </br>
+- **Part 1.** Create Virtual WAN & Virtual Hub </br>
+- **Part 2.** Connect VM-Series Inbound Scale Set to the Virtual Hub </br>
+- **Part 3.** Connect VM-Series Outbound Scale Set to the Virtual Hub </br>
+- **Part 4.** Create Local Spoke VNET </br>
+- **Part 5.** Create Virtual Hub Spoke VNET </br>
 
 
-### Design
+## Architecture
 
 The build shows two types of traffic flows through a Virtual WAN hub.  
 
 1.  <span style="color:blue">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>
     - Additional scale sets can be added throughout different Azure regions to achieve a globally scalable inbound security edge.
 2.  <span style="color:green">East-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>
-    - This design can be adapted into larger infrastructures that have regional hub and spoke architectures.  The VM-Series in each regional hub VNET, can secure ingress traffic coming from virtual WAN hubs.
+    - This design can be integrated into larger infrastructures that have regional hub and spoke architectures.  The VM-Series in each regional hub VNET, can secure ingress traffic coming from virtual WAN hubs.
     - This can design can also be applied for traffic between ExpressRoute and VNET connections.
     - If two VNETs are connected to the same vWAN hub, it is not possible to secure lateral traffic between two vWAN hub VNET connections. 
+
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/wwce/azure-arm/master/Azure-Common-Deployments/v1/images/1fw_1nic_avset.png" alt="drawing" width="500"/>
+</p>
 
 ### Prerequisites
 
