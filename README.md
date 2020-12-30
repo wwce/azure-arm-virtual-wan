@@ -12,7 +12,7 @@ This build illustrates how to secure Azure Virtual WAN traffic with VM-Series sc
 - **Part 5.** Create Virtual Hub Spoke VNET </br>
 
 
-## Architecture
+### Architecture
 
 The build shows two types of traffic flows through a Virtual WAN hub.  
 
@@ -25,56 +25,77 @@ The build shows two types of traffic flows through a Virtual WAN hub.
 
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/wwce/azure-arm/master/Azure-Common-Deployments/v1/images/1fw_1nic_avset.png" alt="drawing" width="500"/>
+<img src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/overview.png" alt="drawing" width="800"/>
 </p>
 
 ### Prerequisites
 
 The following items are required prior to launching the build.  
 
-1.  An active Azure subscription with appropriate permissions and resource quota allocation.
-2.  Inbound VM-Series scale set within a dedicated VNET.
-3.  Outbound VM-Series scale set within a dedicated VNET.
+1.  A active Azure subscription with appropriate permissions and resource allocation quota.
+2.  Panorama
+    - PAN-OS 10.0 or greater
+    - Azure Plugin 3.0 or greater
+3.  Inbound & Outbound VM-Series scale set within a dedicated VNETs.
 
-If you do not have the VM-Series deployed, please see GUIDE.pdf. 
+**If you do not have the VM-Series deployed, please see [Deployment Guide](https://github.com/wwce/azure-arm-virtual-wan/main/GUIDE.pdf) for how-to.**
+
+</br>
 
 ##  Guide
-
+<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png" alt="drawing" width="500"/>
 #### Part 1:  Create Virtual WAN & Virtual Hub
 
+
 In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a Virtual Hub, you can skip this step and proceed to part 2. 
-
+</br>
+</br>
+</br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart1_wan.json)
-
-
-
+</br>
+</br>
+<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png" alt="drawing" width="500"/>
 #### Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
-
 Connects an existing VNET that contains a dedicated inbound set of VM-Series firewalls to the virtual hub created in part 1.
-
+</br>
+</br>
+</br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart2_connect_inbound.json)
- 
+</br>
+</br>
 
 
+<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part3.png" alt="drawing" width="500"/>
 #### Part 3:  Connect Outbound VM-Series Scale Set to the Virtual Hub
-
 Connects an existing VNET that contains a dedicated outbound set of VM-Series firewalls to the virtual hub created in Part 1.
-
+</br>
+</br>
+</br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart3_connect_outbound.json)
+</br>
+</br>
 
 
-
+<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png" alt="drawing" width="500"/>
 #### Part 4:  Create Local Spoke VNET
-
 Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series VNET.  A route table is created to direct all traffic from the spoke VNET to the outbound firewall's interal load balancer.  A route is also added to the virtual hub's route table.  This route will direct virtual WAN traffic destinted to the spoke VNET through the outbound VM-Series VNET connection that was created in part 3.   
-
+</br>
+</br>
+</br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_create_peer_spoke.json)
+</br>
+</br>
 
-
-
+<img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png" alt="drawing" width="500"/>
 #### Part 5:  Create Virtual Hub Spoke VNET
-
 Creates a spoke VNET that is directly connected to the virtual hub created in part 1.  This VNET is used to demonstrate/test internet inbound traffic through the inbound VM-Series and also lateral traffic through the outbound VM-Series. 
-
+</br>
+</br>
+</br>
+</br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart5_create_vhub_spoke.json)
 
