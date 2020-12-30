@@ -43,6 +43,7 @@ The following items are required prior to launching the build.
 </br>
 
 ##  Guide
+
 <img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png" alt="drawing" width="200"/>
 
 ### Part 1:  Create Virtual WAN & Virtual Hub
@@ -54,6 +55,7 @@ In this part, a Virtual WAN is created with a virtual hub.  The hub will be used
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart1_wan.json)
 </br>
 </br>
+
 <img style="float: right;" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png" alt="drawing" width="100"/>
 
 ### Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
