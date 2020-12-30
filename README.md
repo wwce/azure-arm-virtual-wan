@@ -57,6 +57,7 @@ In this part, a Virtual WAN is created with a virtual hub.  The hub will be used
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart1_wan.json)
 </br>
 </br>
+</br>
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png"> Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
 Connects an existing VNET that contains a dedicated inbound set of VM-Series firewalls to the virtual hub created in part 1.
@@ -68,6 +69,7 @@ Connects an existing VNET that contains a dedicated inbound set of VM-Series fir
 </br>
 </br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart2_connect_inbound.json)
+</br>
 </br>
 </br>
 
@@ -83,6 +85,7 @@ Connects an existing VNET that contains a dedicated outbound set of VM-Series fi
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart3_connect_outbound.json)
 </br>
 </br>
+</br>
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png"> Part 4:  Create Local Spoke VNET
 Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series VNET.  A route table is created to direct all traffic from the spoke VNET to the outbound firewall's interal load balancer.  A route is also added to the virtual hub's route table.  This route will direct virtual WAN traffic destinted to the spoke VNET through the outbound VM-Series VNET connection that was created in part 3.   
@@ -94,6 +97,7 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 </br>
 </br>
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fwwce%2Fazure-virtual-wan-connect%2Fmain%2Fpart4_create_peer_spoke.json)
+</br>
 </br>
 </br>
 
