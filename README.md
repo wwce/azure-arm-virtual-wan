@@ -46,11 +46,9 @@ The following items are required prior to launching the build.
 
 
 
-### Part 1:  Create Virtual WAN & Virtual Hub
+### <img align="right" width="500" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png"> Part 1:  Create Virtual WAN & Virtual Hub
 
-
-
-<img align="right" width="200" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png"> In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a Virtual Hub, you can skip this step and proceed to part 2. 
+In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a Virtual Hub, you can skip this step and proceed to part 2. 
 </br>
 </br>
 </br>
