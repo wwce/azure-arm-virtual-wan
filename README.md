@@ -1,5 +1,5 @@
 # Panorama Orchestration & Azure Virtual WAN
-Secure Azure Virtual WAN traffic with Palo Alto Networks VM-Series firewalls. 
+Secure Azure Virtual WAN traffic with Palo Alto Networks VM-Series firewalls.  Please see the [Deployment Guide](https://github.com/wwce/azure-arm-virtual-wan/blob/main/GUIDE.pdf) for more information. 
 
 ## Overview 
 
@@ -8,20 +8,19 @@ This build illustrates how to secure Azure Virtual WAN traffic with VM-Series sc
 - **Part 1.** Create Virtual WAN & Virtual Hub </br>
 - **Part 2.** Connect VM-Series Inbound Scale Set to the Virtual Hub </br>
 - **Part 3.** Connect VM-Series Outbound Scale Set to the Virtual Hub </br>
-- **Part 4.** Create Local Spoke VNET </br>
-- **Part 5.** Create Virtual Hub Spoke VNET </br>
+- **Part 4.** Peer Local VNET to VM-Series Outbound VNET </br>
+- **Part 5.** Connect Spoke VNET to Virtual Hub</br>
 
 
 ### Architecture
 
 The build shows two types of traffic flows through a Virtual WAN hub.  
 
-1.  <span style="color:blue">Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)</span>
+1.  Internet inbound traffic through a VM-Series scale set to directly connected hub virtual network (vwan-spoke)
     - Additional scale sets can be added throughout different Azure regions to achieve a globally scalable inbound security edge.
-2.  <span style="color:green">East-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network</span>
+2.  East-West traffic through a VM-Series scale set from a vwan-spoke to a locally peered virtual network
     - This design can be integrated into larger infrastructures that have regional hub and spoke architectures.  The VM-Series in each regional hub VNET, can secure ingress traffic coming from virtual WAN hubs.
     - This can design can also be applied for traffic between ExpressRoute and VNET connections.
-    - If two VNETs are connected to the same vWAN hub, it is not possible to secure lateral traffic between two vWAN hub VNET connections. 
 
 
 <p align="center">
@@ -46,7 +45,7 @@ The following items are required prior to launching the build.
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part1.png"> Part 1:  Create Virtual WAN & Virtual Hub
 
-In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a Virtual Hub, you can skip this step and proceed to part 2. 
+In this part, a Virtual WAN is created with a virtual hub.  The hub will be used in Parts 2 and 3 to direct traffic from connected spokes to the security VNETs.  If you already have a virtual hub, you can skip this step and proceed to part 2. 
 </br>
 </br>
 </br>
@@ -60,7 +59,7 @@ In this part, a Virtual WAN is created with a virtual hub.  The hub will be used
 </br>
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part2.png"> Part 2:  Connect Inbound VM-Series Scale Set to the Virtual Hub 
-Connects an existing VNET that contains a dedicated inbound set of VM-Series firewalls to the virtual hub created in part 1.
+Connects an existing security VNET that contains a VM-Series inbound scale set to the virtual hub created in part 1. 
 </br>
 </br>
 </br>
@@ -75,7 +74,7 @@ Connects an existing VNET that contains a dedicated inbound set of VM-Series fir
 </br>
 
 #### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part3.png"> Part 3:  Connect Outbound VM-Series Scale Set to the Virtual Hub
-Connects an existing VNET that contains a dedicated outbound set of VM-Series firewalls to the virtual hub created in Part 1.
+Connects an existing security VNET that contains a VM-Series outbound scale set to the virtual hub created in part 1.
 </br>
 </br>
 </br>
@@ -88,8 +87,8 @@ Connects an existing VNET that contains a dedicated outbound set of VM-Series fi
 </br>
 </br>
 
-#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png"> Part 4:  Create Local Spoke VNET
-Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series VNET.  A route table is created to direct all traffic from the spoke VNET to the outbound firewall's interal load balancer.  A route is also added to the virtual hub's route table.  This route will direct virtual WAN traffic destinted to the spoke VNET through the outbound VM-Series VNET connection that was created in part 3.   
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part4.png"> Part 4:  Peer Local VNET to VM-Series Outbound VNET
+Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series VNET.  A route table is created to direct all traffic from the spoke VNET to the outbound firewall's interal load balancer.  A route is also added to the virtual hub's route table.  This route will direct virtual WAN traffic destined to the spoke VNET through the outbound VM-Series VNET connection that was created in part 3.   
 </br>
 </br>
 </br>
@@ -98,8 +97,8 @@ Creates a spoke VNET that is peered (via vNet Peering) to the outbound VM-Series
 </br>
 </br>
 
-#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png"> Part 5:  Create Virtual Hub Spoke VNET
-Creates a spoke VNET that is directly connected to the virtual hub created in part 1.  This VNET is used to demonstrate/test internet inbound traffic through the inbound VM-Series and also lateral traffic through the outbound VM-Series. 
+#### <img align="right" width="400" src="https://raw.githubusercontent.com/wwce/azure-arm-virtual-wan/main/images/part5.png"> Part 5:  Connect Spoke VNET to Virtual Hub
+Creates a spoke VNET that is directly connected to the virtual hub created in part 1.  This VNET is used to demonstrate/test internet inbound traffic through the inbound VM-Series and also lateral traffic through the outbound VM-Series its local spoke. 
 </br>
 </br>
 </br>
